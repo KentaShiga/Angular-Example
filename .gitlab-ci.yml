@@ -44,7 +44,7 @@ test:
   extends: .pull_cached_node_modules
   before_script:
     - apt-get update
-    - wget -q -nv https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     - apt -qq install -y ./google-chrome*.deb;
     - export CHROME_BIN=/usr/bin/google-chrome
   script: npm run test-ci
@@ -66,8 +66,15 @@ code_quality:
 
 publish:
   stage: publish
+  variables:
+    PUBLISH_VARIABLE: "prerelease"
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_REF_NAME =~ /^v\d+\.\d+\.\d+.*$/
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        PUBLISH_VARIABLE: "prerelease"
+    - if: $CI_COMMIT_REF_NAME =~ /^v\d+\.\d+\.\d+.*$/
+      variables:
+        PUBLISH_VARIABLE: "release"
   script:
     # If no .npmrc is included in the repo, generate a temporary one that is configured to publish to GitLab's NPM registry
     - |
@@ -84,12 +91,21 @@ publish:
     - NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
     - NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
+    # When building on the default branch, use the prerelease version.
+    - if [ "${PUBLISH_VARIABLE" == release]; then
+        NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}"
+      else
+        NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}-rc.${CI_PIPELINE_IID}"
+      fi
+
+    - npm version "${NPM_PUBLISH_VERSION}" --no-git-tag-version --allow-same-version
+
     # Compare the version in package.json to all published versions.
     # If the package.json version has not yet been published, run `npm publish`.
     - |
-      if [[ $(npm view "${NPM_PACKAGE_NAME}" versions) != *"'${NPM_PACKAGE_VERSION}'"* ]]; then
+      if [[ $(npm view "${NPM_PACKAGE_NAME}" versions) != *"'${NPM_PUBLISH_VERSION}'"* ]]; then
         npm publish
-        echo "Successfully published version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} to GitLab's NPM registry: ${CI_PROJECT_URL}/-/packages"
+        echo "Successfully published version ${NPM_PACKAGE_NPM_PUBLISH_VERSIONVERSION} of ${NPM_PACKAGE_NAME} to GitLab's NPM registry: ${CI_PROJECT_URL}/-/packages"
       else
-        echo "Version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} has already been published, so no new version has been published."
+        echo "Version ${NPM_PUBLISH_VERSION} of ${NPM_PACKAGE_NAME} has already been published, so no new version has been published."
       fi
