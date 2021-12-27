@@ -44,10 +44,11 @@ test:
   extends: .pull_cached_node_modules
   before_script:
     - apt-get update
-    - wget -q --show-progress https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     - apt -qq install -y ./google-chrome*.deb;
     - export CHROME_BIN=/usr/bin/google-chrome
   script: npm run test-ci
+  allow_failure: true
   # artifacts:
   #   when: always
   #   reports:
