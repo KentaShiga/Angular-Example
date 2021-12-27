@@ -1,8 +1,3 @@
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/npm.gitlab-ci.yml
-
 image: node:16 #tentative
 
 cache:
@@ -49,6 +44,7 @@ test:
     - export CHROME_BIN=/usr/bin/google-chrome
   script: npm run test-ci
   allow_failure: true
+  # tentative
   # artifacts:
   #   when: always
   #   reports:
@@ -92,11 +88,13 @@ publish:
     - NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
     # When building on the default branch, use the prerelease version.
-    - if [ "${PUBLISH_VARIABLE}" == "release" ]; then
+    - |
+      if [[ "${PUBLISH_VARIABLE}" == "release" ]]; then
         NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}"
       else
         NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}-rc.${CI_PIPELINE_IID}"
       fi
+      echo "Use Version: ${NPM_PUBLISH_VERSION}"
 
     - npm version "${NPM_PUBLISH_VERSION}" --no-git-tag-version --allow-same-version
 
