@@ -44,15 +44,15 @@ test:
   extends: .pull_cached_node_modules
   before_script:
     - apt-get update
-    - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    - apt install -y ./google-chrome*.deb;
+    - wget -q --show-progress https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - apt -qq install -y ./google-chrome*.deb;
     - export CHROME_BIN=/usr/bin/google-chrome
   script: npm run test-ci
-  artifacts:
-    when: always
-    reports:
-      junit: test-result/*.xml #tentative
-    expire_in: 1 week
+  # artifacts:
+  #   when: always
+  #   reports:
+  #     junit: test-result/*.xml #tentative
+  #   expire_in: 1 week
 
 code_quality:
   artifacts:
