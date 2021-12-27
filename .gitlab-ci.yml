@@ -92,7 +92,7 @@ publish:
     - NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
     # When building on the default branch, use the prerelease version.
-    - if [ "${PUBLISH_VARIABLE" == release]; then
+    - if [ "${PUBLISH_VARIABLE}" == "release" ]; then
         NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}"
       else
         NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}-rc.${CI_PIPELINE_IID}"
