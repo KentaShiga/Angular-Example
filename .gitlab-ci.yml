@@ -94,7 +94,7 @@ publish:
       else
         NPM_PUBLISH_VERSION="${NPM_PACKAGE_VERSION}-rc.${CI_PIPELINE_IID}"
       fi
-      echo "Use Version: ${NPM_PUBLISH_VERSION}"
+    - echo "Use following Version -> ${NPM_PUBLISH_VERSION}"
 
     - npm version "${NPM_PUBLISH_VERSION}" --no-git-tag-version --allow-same-version
 
