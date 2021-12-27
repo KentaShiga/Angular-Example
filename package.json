@@ -12,7 +12,7 @@
     "test-ci": "ng test --browsers=ChromeHeadlessCI --code-coverage=true --no-watch --no-progress",
     "e2e": "ng e2e"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "~13.0.0-next.0",
     "@angular/common": "~13.0.0-next.0",
